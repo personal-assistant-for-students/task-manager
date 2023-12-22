@@ -1,4 +1,4 @@
-from src.task_model import TaskStatus
+from task_model import TaskStatus
 
 
 class TaskRepository:
