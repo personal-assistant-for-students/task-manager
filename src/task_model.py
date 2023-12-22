@@ -5,8 +5,8 @@ from enum import Enum
 
 class TaskStatus(Enum):
     TO_DO = "Сделать"
-    IN_PROGRESS = "Делается"
-    DONE = "Сделано"
+    IN_PROGRESS = "Делаю"
+    DONE = "Выполнено"
 
 
 class AdditionalStatus(Enum):

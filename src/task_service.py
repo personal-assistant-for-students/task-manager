@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from task_model import Task
+from task_model import Task, AdditionalStatus
 
 
 class TaskService:
@@ -12,8 +12,8 @@ class TaskService:
         self.repository.add_task(new_task)
         return new_task
 
-    def update_task(self, task_id, **kwargs):
-        self.repository.update_task(task_id, **kwargs)
+    def update_task(self, task_id, status):
+        self.repository.update_task(task_id, status)
         return self.repository.get_task_by_id(task_id)
 
     def delete_task(self, task_id):
@@ -50,3 +50,6 @@ class TaskService:
                 task_data['additional_status'] = new_additional_status
 
         self.repository.update_all_tasks(all_tasks)
+
+    def get_task_by_id(self, task_id):
+        return self.repository.get_task_by_id(task_id)

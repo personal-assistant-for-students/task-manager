@@ -1,10 +1,14 @@
+from src.task_model import TaskStatus
+
+
 class TaskRepository:
     def __init__(self, file_path):
         self.file_path = file_path
         self.tasks = {}
 
     def get_all_tasks(self):
-        return list(self.tasks.values())
+        # Фильтрация задач, чтобы вернуть только те, у которых статус не DONE
+        return [task for task in self.tasks.values() if task.status != TaskStatus.DONE]
 
     def get_task_by_id(self, task_id):
         return self.tasks.get(task_id, None)
@@ -12,17 +16,25 @@ class TaskRepository:
     def add_task(self, task):
         self.tasks[str(task.id)] = task
 
-    def update_task(self, task_id, **kwargs):
+    def update_task(self, task_id, status):
         task = self.get_task_by_id(task_id)
         if not task:
             return None
 
-        for key, value in kwargs.items():
-            if hasattr(task, key) and value is not None:
-                setattr(task, key, value)
+        # Извлекаем значение статуса из словаря
+        status_value = status.get('status')
 
+        # Проверяем, существует ли такой статус в TaskStatus
+        valid_status = next((s for s in TaskStatus if s.value == status_value), None)
+        if valid_status:
+            # Устанавливаем статус, если он найден
+            task.status = valid_status
+        else:
+            # Возвращаем None, если статус не найден
+            return None
+
+        # Сохраняем обновленную задачу
         self.tasks[task_id] = task
-
         return task
 
     def delete_task(self, task_id):
