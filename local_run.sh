@@ -12,7 +12,7 @@ while true; do
             # Run unit tests using unittest discover
             echo "Running unit tests..."
             cd test || exit
-            python -m unittest discover -s test -p "unit_tests_*.py"
+            python3 -m unittest discover -s test -p "unit_tests_*.py"
             cd ..
 
             # Check if all tests passed

@@ -23,9 +23,11 @@ def update_additional_status():
     task_service.get_all_tasks()
     pass
 
+
 # schedule for update additional status (every day at в 00:00)
 trigger = CronTrigger(hour=0, minute=0)
 scheduler.add_job(update_additional_status, trigger=trigger)
+
 
 @app.route('/tasks', methods=['POST'])
 def create_task():
@@ -36,10 +38,19 @@ def create_task():
 
 @app.route('/tasks/<string:task_id>', methods=['PUT'])
 def update_task(task_id):
-    data = request.json
-    updated_task = task_service.update_task(task_id, **data)
+    status = request.json
+    updated_task = task_service.update_task(task_id, status)
     if updated_task:
         return jsonify(updated_task.to_dict()), 200
+    else:
+        return jsonify({"message": "Task not found"}), 404
+
+
+@app.route('/tasks/<string:task_id>', methods=['GET'])
+def get_task_by_id(task_id):
+    task = task_service.get_task_by_id(task_id)
+    if task:
+        return jsonify(task.to_dict()), 200
     else:
         return jsonify({"message": "Task not found"}), 404
 
@@ -62,5 +73,9 @@ def get_all_tasks():
     return jsonify([task.to_dict() for task in tasks]), 200
 
 
-if __name__ == '__main__':
+def main():
     app.run(debug=True)
+
+
+if __name__ == '__main__':
+    main()
