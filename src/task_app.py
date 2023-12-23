@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True)
 app.config['WTF_CSRF_ENABLED'] = False
 
-db_path = "../data/mvp_db.csv"
+db_path = "../data/mvp_db"
 repository = TaskRepository(db_path)
 task_service = TaskService(repository)
 
@@ -32,14 +32,14 @@ scheduler.add_job(update_additional_status, trigger=trigger)
 @app.route('/tasks', methods=['POST'])
 def create_task():
     data = request.json
-    task = task_service.create_task(data['title'], data['content'], data['deadline'])
+    task = task_service.create_task(data['title'], data['content'], data['deadline'], data['user_id'])
     return jsonify(task.to_dict()), 201
 
 
 @app.route('/tasks/<string:task_id>', methods=['PUT'])
 def update_task(task_id):
-    status = request.json
-    updated_task = task_service.update_task(task_id, status)
+    data = request.json
+    updated_task = task_service.update_task(task_id, data['status'], data['user_id'])
     if updated_task:
         return jsonify(updated_task.to_dict()), 200
     else:
@@ -48,7 +48,8 @@ def update_task(task_id):
 
 @app.route('/tasks/<string:task_id>', methods=['GET'])
 def get_task_by_id(task_id):
-    task = task_service.get_task_by_id(task_id)
+    user_id = int(request.data)
+    task = task_service.get_task_by_id(task_id, user_id)
     if task:
         return jsonify(task.to_dict()), 200
     else:
@@ -58,7 +59,8 @@ def get_task_by_id(task_id):
 @app.route('/tasks/<string:task_id>', methods=['DELETE'])
 def delete_task(task_id):
     try:
-        response = task_service.delete_task(task_id)
+        user_id = int(request.data)
+        response = task_service.delete_task(task_id, user_id)
         if "not found" in response["message"]:
             return jsonify(response), 404
         return jsonify(response), 200
@@ -69,7 +71,8 @@ def delete_task(task_id):
 
 @app.route('/tasks', methods=['GET'])
 def get_all_tasks():
-    tasks = task_service.get_all_tasks()
+    user_id = int(request.data)
+    tasks = task_service.get_all_tasks(user_id)
     return jsonify([task.to_dict() for task in tasks]), 200
 
 
